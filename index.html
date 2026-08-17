@@ -578,7 +578,7 @@ $('#scoreModal').on('hidden.bs.modal', function () {
 
         let remaining = nextTierScore - score;
         if (remaining > 0) {
-          $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${tierText === "ระดับ Gold" ? "Diamond" : "Supreme"}</strong> ในปี 2568`);
+          $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${tierText === "ระดับ Gold" ? "Diamond" : "Supreme"}</strong> ในปีนี้`);
         } else {
           $('p:contains("สะสมอีก")').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
         }
