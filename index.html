@@ -297,36 +297,7 @@ text: "กำลังโหลดข้อมูล..."
               $('#profilePic').attr('src', profile.pictureUrl);
 
               let score = parseInt(userData.Score || "0");
-              $('#points').text(score);
-
-              const percent = score / 100;
-              const totalLength = 100;
-              const offset = totalLength * (1 - percent);
-              document.getElementById("progressCurve").style.strokeDashoffset = offset;
-
-              let tierText = "ระดับ Silver";
-              let bgClass = "bg-silver";
-              let nextTierScore = 100;
-
-              if (score >= 350) {
-                tierText = "ระดับ Diamond";
-                bgClass = "bg-diamond";
-                nextTierScore = 800;
-              } else if (score >= 100) {
-                tierText = "ระดับ Gold";
-                bgClass = "bg-gold";
-                nextTierScore = 350;
-              }
-
-              $('.d-flex').removeClass("bg-silver bg-gold bg-diamond").addClass(bgClass);
-              $('.text-center.mt-2.mb-4.fw-bold').text(tierText);
-
-              let remaining = nextTierScore - score;
-              if (remaining > 0) {
-                $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${tierText === "ระดับ Gold" ? "Diamond" : "Supreme"}</strong> ในปี 2568`);
-              } else {
-                $('p:contains("สะสมอีก")').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
-              }
+              updateDashboardUI(score);
 
             } else {
               $('#regSection').show();
@@ -489,56 +460,48 @@ function onScanSuccess(decodedText, decodedResult) {
 }
 
 
-let html5QrcodeScanner;
-// $('#scoreModal').on('shown.bs.modal', function () {
-//   if (!html5QrcodeScanner) {
-//     html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", {
-//       fps: 10,
-//       qrbox: 250
-//     });
-//   }
-//   html5QrcodeScanner.render(onScanSuccess);
-// });
-  
-  $('#scoreModal').on('shown.bs.modal', function () {
-  const html5QrCode = new Html5Qrcode("qr-reader");
+let html5QrCode = null;
+let isScanning = false;
+
+$('#scoreModal').on('shown.bs.modal', function () {
+  html5QrCode = new Html5Qrcode("qr-reader");
   Html5Qrcode.getCameras().then(cameras => {
-    const backCamera = cameras.find(camera => camera.label.toLowerCase().includes("back")) || cameras[0];
-    if (backCamera) {
+    if (cameras && cameras.length > 0) {
+      const backCamera = cameras.find(camera => camera.label.toLowerCase().includes("back")) || cameras[0];
       html5QrCode.start(
-        { deviceId: { exact: backCamera.id } },
+        backCamera.id,
         {
           fps: 10,
-          qrbox: 250
+          qrbox: { width: 250, height: 250 }
         },
         onScanSuccess
-      ).catch(err => {
+      ).then(() => {
+        isScanning = true;
+      }).catch(err => {
         console.error("Camera start error:", err);
-        Swal.fire("ผิดพลาด", "ไม่สามารถเข้าถึงกล้องได้", "error");
+        Swal.fire("ผิดพลาด", "ไม่สามารถเปิดกล้องได้", "error");
       });
+    } else {
+      Swal.fire("ผิดพลาด", "ไม่พบกล้อง", "error");
     }
   }).catch(err => {
     console.error("Camera fetch error:", err);
-    Swal.fire("ผิดพลาด", "ไม่พบกล้อง", "error");
+    Swal.fire("ผิดพลาด", "ไม่สามารถเข้าถึงกล้องได้", "error");
   });
-
-  html5QrcodeScanner = html5QrCode;
 });
 
 $('#scoreModal').on('hidden.bs.modal', function () {
-  if (html5QrcodeScanner) {
-    html5QrcodeScanner.stop().then(() => {
-      html5QrcodeScanner.clear();
+  if (html5QrCode && isScanning) {
+    html5QrCode.stop().then(() => {
+      html5QrCode.clear();
+      isScanning = false;
     }).catch(err => {
       console.warn("Stop camera error", err);
+      html5QrCode.clear();
+      isScanning = false;
     });
-  }
-});
-
-
-$('#scoreModal').on('hidden.bs.modal', function () {
-  if (html5QrcodeScanner) {
-    html5QrcodeScanner.clear();
+  } else if (html5QrCode) {
+    html5QrCode.clear();
   }
 });
   
@@ -552,38 +515,48 @@ $('#scoreModal').on('hidden.bs.modal', function () {
       const userData = data.find(d => d.Uid === uid);
       if (userData) {
         let score = parseInt(userData.Score || "0");
-        $('#points').text(score);
-
-        const percent = score / 100;
-        const totalLength = 100;
-        const offset = totalLength * (1 - percent);
-        document.getElementById("progressCurve").style.strokeDashoffset = offset;
-
-        let tierText = "ระดับ Silver";
-        let bgClass = "bg-silver";
-        let nextTierScore = 100;
-
-        if (score >= 350) {
-          tierText = "ระดับ Diamond";
-          bgClass = "bg-diamond";
-          nextTierScore = 800;
-        } else if (score >= 100) {
-          tierText = "ระดับ Gold";
-          bgClass = "bg-gold";
-          nextTierScore = 350;
-        }
-
-        $('.d-flex').removeClass("bg-silver bg-gold bg-diamond").addClass(bgClass);
-        $('.text-center.mt-2.mb-4.fw-bold').text(tierText);
-
-        let remaining = nextTierScore - score;
-        if (remaining > 0) {
-          $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${tierText === "ระดับ Gold" ? "Diamond" : "Supreme"}</strong> ในปีนี้`);
-        } else {
-          $('p:contains("สะสมอีก")').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
-        }
+        updateDashboardUI(score);
       }
     });
+}
+
+function updateDashboardUI(score) {
+  $('#points').text(score);
+
+  let tierText = "ระดับ Silver";
+  let bgClass = "bg-silver";
+  let nextTierScore = 100;
+  let baseTierScore = 0;
+  let nextTierName = "Gold";
+
+  if (score >= 350) {
+    tierText = "ระดับ Diamond";
+    bgClass = "bg-diamond";
+    nextTierScore = 800;
+    baseTierScore = 350;
+    nextTierName = "Supreme";
+  } else if (score >= 100) {
+    tierText = "ระดับ Gold";
+    bgClass = "bg-gold";
+    nextTierScore = 350;
+    baseTierScore = 100;
+    nextTierName = "Diamond";
+  }
+
+  const percent = Math.min(1, Math.max(0, (score - baseTierScore) / (nextTierScore - baseTierScore)));
+  const totalLength = 126;
+  const offset = totalLength * (1 - percent);
+  document.getElementById("progressCurve").style.strokeDashoffset = offset;
+
+  $('.d-flex').removeClass("bg-silver bg-gold bg-diamond").addClass(bgClass);
+  $('.text-center.mt-2.mb-4.fw-bold').text(tierText);
+
+  let remaining = nextTierScore - score;
+  if (remaining > 0) {
+    $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปี 2568`);
+  } else {
+    $('p:contains("สะสมอีก")').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
+  }
 }
 
   </script>
