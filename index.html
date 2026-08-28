@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <title>Royal Point</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
@@ -20,7 +23,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sanwithz/Form/sanwithzstyle2.min.css">
 
   <!-- Sweet Alert -->
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Loading Overlay -->
   <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js">
@@ -253,7 +256,7 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
+  </style>
 
 </head>
 
@@ -589,7 +592,46 @@ text: "กำลังโหลดข้อมูล..."
     } else {
       liff.login();
     }
-  }).catch(err => console.error(err));
+  }).catch(err => {
+    console.error("LIFF Init Error:", err);
+    $.LoadingOverlay("hide");
+    Swal.fire({
+      icon: "warning",
+      title: "เชื่อมต่อ LINE LIFF ไม่สำเร็จ",
+      html: `
+        <p>ไม่พบ LIFF ID: <code>${liffID}</code> (404 Not Found)</p>
+        <p class="small text-muted">กรุณาตรวจสอบว่า LIFF ID ใน LINE Developers Console ถูกต้อง หรือเปิดใน LINE App</p>
+      `,
+      confirmButtonText: "โหลดข้อมูลทดสอบ (Dev Mode)"
+    }).then(() => {
+      // Fallback Dev Mode: โหลดข้อมูลแรกจาก Sheet มาทดสอบการแสดงผล
+      fetch(jsonUrl)
+        .then(res => res.json())
+        .then(data => {
+          leaderboardData = data.map(item => ({
+            uid: item.Uid,
+            name: item.Name || 'ไม่ระบุชื่อ',
+            room: item.Classroom || '',
+            passport: item.Passport || '',
+            tel: item.Tel || '',
+            score: parseInt(item.Score || "0", 10)
+          }));
+          leaderboardData.sort((a, b) => b.score - a.score);
+
+          const defaultUser = data[0] || { Uid: 'test_uid', Name: 'ผู้ใช้ทดสอบ', Classroom: 'ม.6', Passport: '9999', Tel: '0900000000', Score: '100' };
+          currentUserData = defaultUser;
+          $('#uid').val(defaultUser.Uid);
+          $('#displaySection').show();
+          $('#username').text(defaultUser.Name);
+          $('#phone').html(`<i class="fas fa-phone"></i> ${defaultUser.Tel}`);
+          $('.text-muted span:first').text(`ชั้น ${defaultUser.Classroom} | รหัส ${defaultUser.Passport}`);
+          
+          let score = parseInt(defaultUser.Score || "0");
+          updateDashboardUI(score);
+          renderLeaderboard();
+        });
+    });
+  });
 
   $('#dataForm').ajaxForm({
     url: serverUrl,
