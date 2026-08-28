@@ -371,7 +371,7 @@
             </div>
 
             <p id="nextTierGoalText">สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
-              <strong>Gold</strong> ในปี 2568</p>
+              <strong>Gold</strong> ในปีนี้</p>
 
             <button class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
               <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ดรับพ้อยท์
@@ -964,7 +964,7 @@ function updateDashboardUI(score) {
 
   let remaining = nextTierScore - score;
   if (remaining > 0) {
-    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปี 2568`);
+    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปีนี้`);
   } else {
     $('#nextTierGoalText').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
   }
