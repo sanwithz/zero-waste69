@@ -332,7 +332,7 @@
         <!-- Tab 1: My Points -->
         <div class="tab-pane fade show active" id="pills-mypoints" role="tabpanel" aria-labelledby="pills-mypoints-tab">
           <!-- User Info in Flex Row -->
-          <div class="d-flex align-items-center bg-silver p-3 rounded-4 shadow-sm mb-3 position-relative">
+          <div id="userProfileCard" class="d-flex align-items-center bg-silver p-3 rounded-4 shadow-sm mb-3 position-relative">
             <img id="profilePic" src="https://placehold.co/60x60" class="rounded-circle border border-2 border-white shadow me-3" style="width: 60px; height: 60px;" />
 
             <div>
@@ -367,10 +367,10 @@
                 <path id="progressCurve" d="M 10 50 A 40 40 0 0 1 90 50" stroke="#30674c" stroke-width="10" fill="none"
                   stroke-dasharray="126" stroke-dashoffset="42" stroke-linecap="round" />
               </svg>
-              <div class="text-center mt-2 mb-4 fw-bold">ระดับ Silver</div>
+              <div id="tierBadgeText" class="text-center mt-2 mb-4 fw-bold">ระดับ Silver</div>
             </div>
 
-            <p>สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
+            <p id="nextTierGoalText">สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
               <strong>Gold</strong> ในปี 2568</p>
 
             <button class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
@@ -434,6 +434,9 @@
               <div>กำลังโหลดอันดับ...</div>
             </div>
           </div>
+
+          <!-- Leaderboard Pagination / See More -->
+          <div id="leaderboardPagination" class="mb-4"></div>
         </div>
       </div>
     </div>
@@ -956,14 +959,14 @@ function updateDashboardUI(score) {
   const offset = totalLength * (1 - percent);
   document.getElementById("progressCurve").style.strokeDashoffset = offset;
 
-  $('.d-flex').removeClass("bg-silver bg-gold bg-diamond").addClass(bgClass);
-  $('.text-center.mt-2.mb-4.fw-bold').text(tierText);
+  $('#userProfileCard').removeClass("bg-silver bg-gold bg-diamond").addClass(bgClass);
+  $('#tierBadgeText').text(tierText);
 
   let remaining = nextTierScore - score;
   if (remaining > 0) {
-    $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปี 2568`);
+    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปี 2568`);
   } else {
-    $('p:contains("สะสมอีก")').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
+    $('#nextTierGoalText').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
   }
 }
 
@@ -972,6 +975,9 @@ function updateDashboardUI(score) {
 // ==========================================
 let leaderboardData = [];
 let currentGradeFilter = 'all';
+let leaderboardViewMode = 'top10'; // 'top10' or 'paged'
+let leaderboardPage = 1;
+const LEADERBOARD_PAGE_SIZE = 24;
 
 function loadLeaderboard(forceRefresh = false) {
   if (leaderboardData.length > 0 && !forceRefresh) {
@@ -985,6 +991,7 @@ function loadLeaderboard(forceRefresh = false) {
       <div>กำลังโหลดข้อมูลอันดับ...</div>
     </div>
   `);
+  $('#leaderboardPagination').html('');
 
   fetch(jsonUrl)
     .then(res => res.json())
@@ -1009,14 +1016,39 @@ function loadLeaderboard(forceRefresh = false) {
           <i class="fa-solid fa-triangle-exclamation me-1"></i> ไม่สามารถโหลดข้อมูลอันดับได้ กรุณาลองใหม่อีกครั้ง
         </div>
       `);
+      $('#leaderboardPagination').html('');
     });
 }
 
 function filterLeaderboard(grade, btnElem) {
   currentGradeFilter = grade;
+  leaderboardViewMode = 'top10';
+  leaderboardPage = 1;
   $('#gradeFilters button').removeClass('btn-primary active-filter').addClass('btn-outline-secondary');
   $(btnElem).removeClass('btn-outline-secondary').addClass('btn-primary active-filter');
   renderLeaderboard();
+}
+
+function showFullLeaderboard(page = 1) {
+  leaderboardViewMode = 'paged';
+  leaderboardPage = page;
+  renderLeaderboard();
+
+  const listElem = document.getElementById('leaderboardList');
+  if (listElem) {
+    listElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function collapseToTop10() {
+  leaderboardViewMode = 'top10';
+  leaderboardPage = 1;
+  renderLeaderboard();
+
+  const listElem = document.getElementById('leaderboardList');
+  if (listElem) {
+    listElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function getTierBadge(score) {
@@ -1126,20 +1158,42 @@ function renderLeaderboard() {
     $('#podiumSection').hide();
   }
 
-  // แสดงผลรายการตารางอันดับทั้งหมด
-  if (filtered.length === 0) {
+  // แสดงผลรายการตารางอันดับ
+  const totalItems = filtered.length;
+  if (totalItems === 0) {
     $('#leaderboardList').html(`
       <div class="text-center py-4 text-muted bg-white rounded-4 shadow-sm">
         <i class="fa-solid fa-user-slash fa-2x mb-2 text-secondary"></i>
         <div>ไม่พบข้อมูลผู้ใช้งานในระดับชั้นนี้</div>
       </div>
     `);
+    $('#leaderboardPagination').html('');
     return;
   }
 
+  let displayItems = [];
+  let startIndex = 0;
+  let endIndex = 0;
+
+  if (leaderboardViewMode === 'top10') {
+    displayItems = filtered.slice(0, 10);
+    startIndex = 1;
+    endIndex = displayItems.length;
+  } else {
+    const totalPages = Math.ceil(totalItems / LEADERBOARD_PAGE_SIZE);
+    if (leaderboardPage > totalPages) leaderboardPage = totalPages;
+    if (leaderboardPage < 1) leaderboardPage = 1;
+
+    const from = (leaderboardPage - 1) * LEADERBOARD_PAGE_SIZE;
+    const to = from + LEADERBOARD_PAGE_SIZE;
+    displayItems = filtered.slice(from, to);
+    startIndex = from + 1;
+    endIndex = Math.min(to, totalItems);
+  }
+
   let listHtml = '';
-  filtered.forEach((item, index) => {
-    const rank = index + 1;
+  displayItems.forEach((item, i) => {
+    const rank = (leaderboardViewMode === 'top10') ? (i + 1) : ((leaderboardPage - 1) * LEADERBOARD_PAGE_SIZE + i + 1);
     const isMe = String(item.uid).trim() === String(currentUid).trim();
     let rankBadgeClass = 'other';
     let rankIcon = `#${rank}`;
@@ -1174,6 +1228,68 @@ function renderLeaderboard() {
   });
 
   $('#leaderboardList').html(listHtml);
+
+  // ส่วน Pagination หรือ ปุ่ม See More
+  let paginationHtml = '';
+  if (leaderboardViewMode === 'top10') {
+    if (totalItems > 10) {
+      paginationHtml = `
+        <div class="text-center mt-3">
+          <button class="btn btn-outline-primary rounded-pill px-4 py-2 shadow-sm fw-bold w-100" onclick="showFullLeaderboard(1)">
+            <i class="fa-solid fa-angles-down me-1"></i> ดูอันดับเพิ่มเติม (ทั้งหมด ${totalItems} คน)
+          </button>
+        </div>
+      `;
+    }
+  } else {
+    const totalPages = Math.ceil(totalItems / LEADERBOARD_PAGE_SIZE);
+
+    paginationHtml += `
+      <div class="mt-3 p-3 bg-white rounded-4 shadow-sm border">
+        <div class="d-flex align-items-center justify-content-between mb-2 px-1 small text-muted">
+          <span>แสดงอันดับที่ <strong>${startIndex} - ${endIndex}</strong> จาก ${totalItems} คน</span>
+          <button class="btn btn-sm btn-link text-decoration-none p-0 text-secondary" onclick="collapseToTop10()">
+            <i class="fa-solid fa-compress me-1"></i> ย่อเหลือ Top 10
+          </button>
+        </div>
+    `;
+
+    if (totalPages > 1) {
+      paginationHtml += `
+        <nav aria-label="Leaderboard pagination" class="mt-2">
+          <ul class="pagination pagination-sm justify-content-center mb-0 flex-wrap gap-1">
+            <li class="page-item ${leaderboardPage === 1 ? 'disabled' : ''}">
+              <button class="page-link rounded-pill px-3" onclick="showFullLeaderboard(${leaderboardPage - 1})" aria-label="Previous">
+                <i class="fa-solid fa-chevron-left"></i> ก่อนหน้า
+              </button>
+            </li>
+      `;
+
+      for (let p = 1; p <= totalPages; p++) {
+        paginationHtml += `
+          <li class="page-item ${p === leaderboardPage ? 'active' : ''}">
+            <button class="page-link rounded-pill px-3 ${p === leaderboardPage ? 'bg-primary text-white border-primary' : ''}" onclick="showFullLeaderboard(${p})">
+              ${p}
+            </button>
+          </li>
+        `;
+      }
+
+      paginationHtml += `
+            <li class="page-item ${leaderboardPage === totalPages ? 'disabled' : ''}">
+              <button class="page-link rounded-pill px-3" onclick="showFullLeaderboard(${leaderboardPage + 1})" aria-label="Next">
+                ถัดไป <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      `;
+    }
+
+    paginationHtml += `</div>`;
+  }
+
+  $('#leaderboardPagination').html(paginationHtml);
 }
 
   </script>
