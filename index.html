@@ -6,15 +6,15 @@
   <title>Royal Point</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
 
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
   <!-- Sanwithz Style -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sanwithz/Form/sanwithzstyle2.min.css">
@@ -86,7 +86,173 @@
     .modal-fullscreen .modal-body {
       overflow-y: auto;
     }
-  </style>
+
+    /* Custom Nav Pills */
+    .custom-nav-pills {
+      background: #e2e8f0;
+      border-radius: 50rem;
+      padding: 5px;
+    }
+
+    .custom-nav-pills .nav-link {
+      border-radius: 50rem;
+      font-weight: 600;
+      color: #475569;
+      padding: 9px 18px;
+      transition: all 0.25s ease;
+      font-size: 15px;
+    }
+
+    .custom-nav-pills .nav-link.active {
+      background: linear-gradient(135deg, #198754, #157347);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(25, 135, 84, 0.35);
+    }
+
+    /* Podium Styles */
+    .podium-wrapper {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 12px;
+      margin: 15px 0 25px;
+      padding: 10px 5px 0;
+    }
+
+    .podium-item {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .podium-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .podium-crown {
+      position: absolute;
+      top: -14px;
+      font-size: 17px;
+      color: #FFD700;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+      animation: crownBounce 2s infinite ease-in-out;
+    }
+
+    @keyframes crownBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .podium-rank-1 .podium-avatar {
+      width: 62px;
+      height: 62px;
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #FFF3B0, #FFD700);
+      color: #7A4F01;
+      border: 3px solid #FFD700;
+      box-shadow: 0 4px 14px rgba(255, 215, 0, 0.45);
+    }
+
+    .podium-rank-2 .podium-avatar {
+      background: linear-gradient(135deg, #FFFFFF, #C0C0C0);
+      color: #333333;
+      border: 3px solid #C0C0C0;
+      box-shadow: 0 3px 10px rgba(192, 192, 192, 0.4);
+    }
+
+    .podium-rank-3 .podium-avatar {
+      background: linear-gradient(135deg, #FFE0CC, #CD7F32);
+      color: #522700;
+      border: 3px solid #CD7F32;
+      box-shadow: 0 3px 10px rgba(205, 127, 50, 0.4);
+    }
+
+    .podium-block {
+      width: 100%;
+      border-radius: 14px 14px 6px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 2px;
+      font-weight: bold;
+    }
+
+    .podium-rank-1 .podium-block {
+      height: 95px;
+      background: linear-gradient(180deg, #FFE082, #FFCA28);
+      color: #5D4037;
+      border: 1px solid #FFD54F;
+    }
+
+    .podium-rank-2 .podium-block {
+      height: 75px;
+      background: linear-gradient(180deg, #F5F5F5, #E0E0E0);
+      color: #424242;
+      border: 1px solid #E0E0E0;
+    }
+
+    .podium-rank-3 .podium-block {
+      height: 60px;
+      background: linear-gradient(180deg, #FFE0B2, #FFCC80);
+      color: #4E342E;
+      border: 1px solid #FFB74D;
+    }
+
+    /* Leaderboard Items */
+    .lb-item {
+      transition: all 0.2s ease;
+      border-radius: 16px;
+      border: 1px solid #f1f5f9;
+    }
+
+    .lb-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .lb-item.current-user-row {
+      background: linear-gradient(90deg, #ecfdf5, #ffffff) !important;
+      border: 2px solid #10b981 !important;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25) !important;
+    }
+
+    .rank-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .rank-badge.top-1 { background: #FFD700; color: #5D4037; box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4); }
+    .rank-badge.top-2 { background: #E2E8F0; color: #334155; }
+    .rank-badge.top-3 { background: #CD7F32; color: #FFFFFF; }
+    .rank-badge.other { background: #f1f5f9; color: #64748b; }
+
+    .filter-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .filter-scroll {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
 
 
 </head>
@@ -145,59 +311,127 @@
 
     <div id="displaySection" class="list mt-2">
 
+      <!-- Navigation Tabs -->
+      <ul class="nav nav-pills custom-nav-pills nav-justified mb-3 shadow-sm" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="pills-mypoints-tab" data-bs-toggle="pill" data-bs-target="#pills-mypoints" type="button" role="tab" aria-controls="pills-mypoints" aria-selected="true">
+            <i class="fa-solid fa-award me-1"></i> พ้อยท์ของฉัน
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="pills-leaderboard-tab" data-bs-toggle="pill" data-bs-target="#pills-leaderboard" type="button" role="tab" aria-controls="pills-leaderboard" aria-selected="false" onclick="loadLeaderboard()">
+            <i class="fa-solid fa-trophy me-1"></i> กระดานผู้นำ
+          </button>
+        </li>
+      </ul>
 
+      <div class="tab-content" id="pills-tabContent">
+        <!-- Tab 1: My Points -->
+        <div class="tab-pane fade show active" id="pills-mypoints" role="tabpanel" aria-labelledby="pills-mypoints-tab">
+          <!-- User Info in Flex Row -->
+          <div class="d-flex align-items-center bg-silver p-3 rounded-4 shadow-sm mb-3 position-relative">
+            <img id="profilePic" src="https://placehold.co/60x60" class="rounded-circle border border-2 border-white shadow me-3" style="width: 60px; height: 60px;" />
 
+            <div>
+              <div class="d-flex align-items-center">
+                <span class="fw-bold fs-6" id="username">KruBank Sitti</span>
+                <button class="btn btn-sm btn-link text-dark p-0 ms-2" onclick="openEditProfileModal()" title="แก้ไขข้อมูลส่วนตัว">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+              </div>
+              <div class="text-muted small">
+                <span>ชั้น ม.6/99 เลขประจำตัวนักเรียน 99</span><br/>
+                <span id="phone"><i class="fas fa-phone"></i> 0906616611</span>
+              </div>
+            </div>
+            <div class="ms-auto text-end">
+              <div class="text-warning fw-bold" style="margin-right: 10px;">
+                <h2><i class="fas fa-coins"></i></h2>
+                <h2 id="points">100</h2>
+                <h5>พ้อยท์</h5>
+              </div>
+            </div>
+          </div>
 
-      <!-- User Info in Flex Row -->
-      <div class="d-flex align-items-center bg-silver p-3 rounded-4 shadow-sm mb-3">
-        <img id="profilePic" src="https://placehold.co/60x60" class="rounded-circle border border-2 border-white shadow me-3" style="width: 60px; height: 60px;" />
+          <div class="text-center mt-2">
+            <!-- Progress Curve -->
+            <div>
+              <svg viewBox="0 0 100 50" class="w-100">
+                <!-- background circle -->
+                <path d="M 10 50 A 40 40 0 0 1 90 50" stroke="#eee" stroke-width="10" fill="none" />
 
-        <div>
-          <div class="fw-bold fs-6" id="username">KruBank Sitti</div>
-          <div class="text-muted small">
-            <span>ชั้น ม.6/99 เลขประจำตัวนักเรียน 99</span><br/>
-            <span id="phone"><i class="fas fa-phone"></i> 0906616611</span>
+                <!-- foreground curve progress -->
+                <path id="progressCurve" d="M 10 50 A 40 40 0 0 1 90 50" stroke="#30674c" stroke-width="10" fill="none"
+                  stroke-dasharray="126" stroke-dashoffset="42" stroke-linecap="round" />
+              </svg>
+              <div class="text-center mt-2 mb-4 fw-bold">ระดับ Silver</div>
+            </div>
+
+            <p>สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
+              <strong>Gold</strong> ในปี 2568</p>
+
+            <button class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
+              <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ดรับพ้อยท์
+            </button>
+
+            <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="openEditProfileModal()">
+              <i class="fa-solid fa-user-pen"></i> แก้ไขข้อมูล
+            </button>
+
+            <button class="btn btn-primary btn-sm me-2 mb-2" onclick="refreshUserScore()" title="รีเฟรชคะแนน">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+
           </div>
         </div>
-        <div class="ms-auto text-end">
-          <div class="text-warning fw-bold" style="margin-right: 10px;">
-            <h2><i class="fas fa-coins"></i></h2>
-            <h2 id="points">100</h2>
-            <h5>พ้อยท์</h5>
+
+        <!-- Tab 2: Leaderboard -->
+        <div class="tab-pane fade" id="pills-leaderboard" role="tabpanel" aria-labelledby="pills-leaderboard-tab">
+          <!-- My Rank Banner -->
+          <div id="myRankBanner" class="p-3 mb-3 rounded-4 shadow-sm bg-white border border-success border-2 d-flex align-items-center">
+            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.25rem;">
+              <i class="fa-solid fa-ranking-star"></i>
+            </div>
+            <div>
+              <div class="small text-muted">อันดับของคุณในขณะนี้</div>
+              <div class="fw-bold fs-5 text-success" id="myRankText">อันดับที่ -</div>
+            </div>
+            <div class="ms-auto text-end">
+              <div class="fw-bold text-dark fs-6" id="myRankScore">0 พ้อยท์</div>
+              <div class="small text-muted" id="totalUsersCount">ทั้งหมด - คน</div>
+            </div>
+          </div>
+
+          <!-- Grade Filter Pills -->
+          <div class="d-flex overflow-auto gap-2 pb-2 mb-3 filter-scroll" id="gradeFilters">
+            <button class="btn btn-sm btn-primary rounded-pill px-3 active-filter text-nowrap" onclick="filterLeaderboard('all', this)">ทั้งหมด</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" onclick="filterLeaderboard('ม.1', this)">ม.1</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" onclick="filterLeaderboard('ม.2', this)">ม.2</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" onclick="filterLeaderboard('ม.3', this)">ม.3</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" onclick="filterLeaderboard('ม.4', this)">ม.4</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" onclick="filterLeaderboard('ม.5', this)">ม.5</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 text-nowrap" onclick="filterLeaderboard('ม.6', this)">ม.6</button>
+          </div>
+
+          <!-- Top 3 Podium -->
+          <div id="podiumSection" class="podium-wrapper"></div>
+
+          <!-- Header & Refresh -->
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="fw-bold text-secondary small"><i class="fa-solid fa-list-ol me-1"></i> อันดับคะแนนทั้งหมด</span>
+            <button class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="loadLeaderboard(true)">
+              <i class="fa-solid fa-arrows-rotate me-1"></i> อัปเดตอันดับ
+            </button>
+          </div>
+
+          <!-- Full Ranking List -->
+          <div id="leaderboardList" class="d-flex flex-column gap-2 mb-3">
+            <div class="text-center py-4 text-muted">
+              <i class="fa fa-spinner fa-spin fa-2x mb-2 text-primary"></i>
+              <div>กำลังโหลดอันดับ...</div>
+            </div>
           </div>
         </div>
-      </div>
-
-
-      <div class="text-center mt-2">
-        <!-- Progress Curve -->
-        <div>
-          <svg viewBox="0 0 100 50" class="w-100">
-            <!-- background circle -->
-            <path d="M 10 50 A 40 40 0 0 1 90 50" stroke="#eee" stroke-width="10" fill="none" />
-
-            <!-- foreground curve progress -->
-            <path id="progressCurve" d="M 10 50 A 40 40 0 0 1 90 50" stroke="#30674c" stroke-width="10" fill="none"
-              stroke-dasharray="126" stroke-dashoffset="42" stroke-linecap="round" />
-          </svg>
-          <div class="text-center mt-2 mb-4 fw-bold">ระดับ Silver</div>
-        </div>
-
-
-        <!--         <div class="progress my-3" style="height: 20px;">
-          <div class="progress-bar bg-primary" style="width: 66%;">Silver</div>
-        </div> -->
-        <p>สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
-          <strong>Gold</strong> ในปีนี้</p>
-
-        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
-  <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ดรับพ้อยท์
-</button>
-
-        <button class="btn btn-primary btn-sm me-2" onclick="refreshUserScore()">
-      <i class="fa-solid fa-arrows-rotate"></i>
-    </button>
-
       </div>
     </div>
 
@@ -258,6 +492,34 @@
     </div>
   </div>
 
+  <!-- Modal: Edit Profile -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="editProfileModalLabel"><i class="fa-solid fa-user-pen me-2"></i> แก้ไขข้อมูลส่วนตัว</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="ปิด"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="editProfileForm" onsubmit="saveProfileEdit(event)">
+            <div class="mb-3">
+              <label for="editName" class="form-label fw-bold">ชื่อ - นามสกุล</label>
+              <input type="text" class="form-control" id="editName" required placeholder="กรอกชื่อ-นามสกุล">
+            </div>
+            <div class="mb-3">
+              <label for="editTelephone" class="form-label fw-bold">เบอร์โทรศัพท์</label>
+              <input type="tel" class="form-control" id="editTelephone" required placeholder="กรอกเบอร์โทรศัพท์">
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+              <button type="submit" class="btn btn-success"><i class="fa-solid fa-floppy-disk me-1"></i> บันทึกข้อมูล</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 
 
@@ -265,6 +527,7 @@
     const serverUrl = "https://script.google.com/macros/s/AKfycbzBTCXCb7kChpavMQ5-XeLbrqgWvUgFxg4sC0feu6iySmhBdZyJNs-1Y-BDBkk0m0tjIg/exec";
 const liffID = "2006507083-bcBrTrxw";
 const jsonUrl = "https://opensheet.elk.sh/10ACvBdHWX_0QrXlAZ2Yo3bLMqbRAOfakunE16abKUpE/Score";
+let currentUserData = null;
 
 $(document).ready(function () {
 
@@ -288,8 +551,19 @@ text: "กำลังโหลดข้อมูล..."
         fetch(jsonUrl)
           .then(res => res.json())
           .then(data => {
+            leaderboardData = data.map(item => ({
+              uid: item.Uid,
+              name: item.Name || 'ไม่ระบุชื่อ',
+              room: item.Classroom || '',
+              passport: item.Passport || '',
+              tel: item.Tel || '',
+              score: parseInt(item.Score || "0", 10)
+            }));
+            leaderboardData.sort((a, b) => b.score - a.score);
+
             const userData = data.find(d => d.Uid === uid);
             if (userData) {
+              currentUserData = userData;
               $('#displaySection').show();
               $('#username').text(userData.Name);
               $('#phone').html(`<i class="fas fa-phone"></i> ${userData.Tel}`);
@@ -298,6 +572,7 @@ text: "กำลังโหลดข้อมูล..."
 
               let score = parseInt(userData.Score || "0");
               updateDashboardUI(score);
+              renderLeaderboard();
 
             } else {
               $('#regSection').show();
@@ -335,10 +610,22 @@ text: "กำลังโหลดข้อมูล..."
           text: 'ข้อมูลของคุณถูกบันทึกแล้ว'
         });
 
-        $('#username').text($('#name').val());
-        $('#phone').html('<i class="fas fa-phone"></i> ' + $('#telephone').val());
+        const nameVal = $('#name').val();
+        const telVal = $('#telephone').val();
         const room = $('#room').val();
         const passport = $('#passport').val();
+
+        currentUserData = {
+          Uid: $('#uid').val(),
+          Name: nameVal,
+          Tel: telVal,
+          Classroom: room,
+          Passport: passport,
+          Score: "0"
+        };
+
+        $('#username').text(nameVal);
+        $('#phone').html('<i class="fas fa-phone"></i> ' + telVal);
         $('.text-muted span:first').text(`ชั้น ${room} เลขที่ ${passport}`);
         $('#points').text('0');
 
@@ -507,15 +794,94 @@ $('#scoreModal').on('hidden.bs.modal', function () {
   
   
   
-  function refreshUserScore() {
+function openEditProfileModal() {
+  const currentName = currentUserData?.Name || $('#username').text().trim();
+  const currentTel = currentUserData?.Tel || $('#phone').text().replace(/[^0-9]/g, '').trim();
+
+  $('#editName').val(currentName);
+  $('#editTelephone').val(currentTel);
+  $('#editProfileModal').modal('show');
+}
+
+function saveProfileEdit(e) {
+  e.preventDefault();
+  const uid = $('#uid').val();
+  const newName = $('#editName').val().trim();
+  const newTel = $('#editTelephone').val().trim();
+
+  if (!newName || !newTel) {
+    Swal.fire("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบถ้วน", "warning");
+    return;
+  }
+
+  $.LoadingOverlay("show", {
+    image: "",
+    fontawesome: "fa fa-spinner fa-spin",
+    text: "กำลังบันทึกข้อมูล..."
+  });
+
+  const payload = {
+    action: 'editProfile',
+    type: 'editProfile',
+    uid: uid,
+    name: newName,
+    telephone: newTel,
+    tel: newTel
+  };
+
+  fetch(serverUrl, {
+    method: "POST",
+    body: new URLSearchParams(payload)
+  })
+    .then(res => res.json())
+    .then(result => {
+      $.LoadingOverlay("hide");
+      if (result.status === 'success') {
+        if (currentUserData) {
+          currentUserData.Name = newName;
+          currentUserData.Tel = newTel;
+        }
+        $('#username').text(newName);
+        $('#phone').html(`<i class="fas fa-phone"></i> ${newTel}`);
+        
+        $('#editProfileModal').modal('hide');
+        Swal.fire("สำเร็จ", "แก้ไขข้อมูลส่วนตัวเรียบร้อยแล้ว", "success");
+      } else {
+        Swal.fire("ผิดพลาด", result.message || "ไม่สามารถบันทึกข้อมูลได้", "error");
+      }
+    })
+    .catch(error => {
+      $.LoadingOverlay("hide");
+      console.error("Save profile error:", error);
+      Swal.fire("ผิดพลาด", "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้", "error");
+    });
+}
+
+function refreshUserScore() {
   fetch(jsonUrl)
     .then(res => res.json())
     .then(data => {
       const uid = $('#uid').val();
       const userData = data.find(d => d.Uid === uid);
       if (userData) {
+        currentUserData = userData;
+        $('#username').text(userData.Name);
+        $('#phone').html(`<i class="fas fa-phone"></i> ${userData.Tel}`);
         let score = parseInt(userData.Score || "0");
         updateDashboardUI(score);
+      }
+      // Update leaderboard data if loaded
+      if (leaderboardData.length > 0) {
+        leaderboardData = data.map(item => ({
+          uid: item.Uid,
+          name: item.Name || 'ไม่ระบุชื่อ',
+          room: item.Classroom || '',
+          passport: item.Passport || '',
+          tel: item.Tel || '',
+          score: parseInt(item.Score || "0", 10)
+        }));
+        leaderboardData.sort((a, b) => b.score - a.score);
+        renderLeaderboard();
       }
     });
 }
@@ -553,10 +919,219 @@ function updateDashboardUI(score) {
 
   let remaining = nextTierScore - score;
   if (remaining > 0) {
-    $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปีนี้`);
+    $('p:contains("สะสมอีก")').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/68</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปี 2568`);
   } else {
     $('p:contains("สะสมอีก")').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
   }
+}
+
+// ==========================================
+// Leaderboard System
+// ==========================================
+let leaderboardData = [];
+let currentGradeFilter = 'all';
+
+function loadLeaderboard(forceRefresh = false) {
+  if (leaderboardData.length > 0 && !forceRefresh) {
+    renderLeaderboard();
+    return;
+  }
+
+  $('#leaderboardList').html(`
+    <div class="text-center py-4 text-muted bg-white rounded-4 shadow-sm">
+      <i class="fa fa-spinner fa-spin fa-2x mb-2 text-primary"></i>
+      <div>กำลังโหลดข้อมูลอันดับ...</div>
+    </div>
+  `);
+
+  fetch(jsonUrl)
+    .then(res => res.json())
+    .then(data => {
+      leaderboardData = data.map(item => ({
+        uid: item.Uid,
+        name: item.Name || 'ไม่ระบุชื่อ',
+        room: item.Classroom || '',
+        passport: item.Passport || '',
+        tel: item.Tel || '',
+        score: parseInt(item.Score || "0", 10)
+      }));
+
+      // เรียงลำดับคะแนนจากมากไปน้อย
+      leaderboardData.sort((a, b) => b.score - a.score);
+      renderLeaderboard();
+    })
+    .catch(err => {
+      console.error("Leaderboard load error:", err);
+      $('#leaderboardList').html(`
+        <div class="alert alert-danger text-center py-3 rounded-4 shadow-sm">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i> ไม่สามารถโหลดข้อมูลอันดับได้ กรุณาลองใหม่อีกครั้ง
+        </div>
+      `);
+    });
+}
+
+function filterLeaderboard(grade, btnElem) {
+  currentGradeFilter = grade;
+  $('#gradeFilters button').removeClass('btn-primary active-filter').addClass('btn-outline-secondary');
+  $(btnElem).removeClass('btn-outline-secondary').addClass('btn-primary active-filter');
+  renderLeaderboard();
+}
+
+function getTierBadge(score) {
+  if (score >= 350) {
+    return '<span class="badge bg-dark text-info border border-info px-2 py-1"><i class="fa-solid fa-gem me-1"></i>Diamond</span>';
+  } else if (score >= 100) {
+    return '<span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-crown me-1"></i>Gold</span>';
+  }
+  return '<span class="badge bg-secondary px-2 py-1"><i class="fa-solid fa-shield me-1"></i>Silver</span>';
+}
+
+function renderLeaderboard() {
+  const currentUid = $('#uid').val();
+
+  // กรองตามระดับชั้น
+  let filtered = leaderboardData;
+  if (currentGradeFilter !== 'all') {
+    filtered = leaderboardData.filter(item => item.room && item.room.includes(currentGradeFilter));
+  }
+
+  // หาลำดับของผู้ใช้ปัจจุบัน
+  const myIndex = filtered.findIndex(item => String(item.uid).trim() === String(currentUid).trim());
+  if (myIndex !== -1) {
+    const myItem = filtered[myIndex];
+    $('#myRankText').html(`อันดับที่ <strong class="fs-4">#${myIndex + 1}</strong>`);
+    $('#myRankScore').html(`<i class="fa-solid fa-coins text-warning me-1"></i>${myItem.score} พ้อยท์`);
+    $('#totalUsersCount').text(`จากทั้งหมด ${filtered.length} คน`);
+  } else {
+    $('#myRankText').text('ยังไม่มีอันดับในกลุ่มนี้');
+    $('#myRankScore').text('');
+    $('#totalUsersCount').text(`ทั้งหมด ${filtered.length} คน`);
+  }
+
+  // แสดงผล Top 3 Podium
+  if (filtered.length >= 1) {
+    const top1 = filtered[0];
+    const top2 = filtered.length > 1 ? filtered[1] : null;
+    const top3 = filtered.length > 2 ? filtered[2] : null;
+
+    let podiumHtml = '';
+
+    // Rank 2 (ซ้าย)
+    if (top2) {
+      const isTop2Me = String(top2.uid).trim() === String(currentUid).trim();
+      podiumHtml += `
+        <div class="podium-item podium-rank-2">
+          <div class="podium-avatar shadow-sm">
+            ${top2.name.charAt(0)}
+          </div>
+          <div class="small fw-bold text-truncate" style="max-width: 90px;" title="${top2.name}">
+            ${top2.name} ${isTop2Me ? '<span class="badge bg-success" style="font-size: 9px;">คุณ</span>' : ''}
+          </div>
+          <div class="text-muted" style="font-size: 11px;">${top2.room}</div>
+          <div class="podium-block shadow-sm mt-1">
+            <div class="fs-5">🥈 2</div>
+            <div class="small text-dark fw-bold">${top2.score} pts</div>
+          </div>
+        </div>
+      `;
+    } else {
+      podiumHtml += `<div class="podium-item"></div>`;
+    }
+
+    // Rank 1 (ตรงกลาง)
+    const isTop1Me = String(top1.uid).trim() === String(currentUid).trim();
+    podiumHtml += `
+      <div class="podium-item podium-rank-1">
+        <div class="podium-avatar shadow">
+          <i class="fa-solid fa-crown podium-crown"></i>
+          ${top1.name.charAt(0)}
+        </div>
+        <div class="small fw-bold text-truncate" style="max-width: 100px;" title="${top1.name}">
+          ${top1.name} ${isTop1Me ? '<span class="badge bg-success" style="font-size: 9px;">คุณ</span>' : ''}
+        </div>
+        <div class="text-muted" style="font-size: 11px;">${top1.room}</div>
+        <div class="podium-block shadow mt-1">
+          <div class="fs-4">🥇 1</div>
+          <div class="small text-dark fw-bold">${top1.score} pts</div>
+        </div>
+      </div>
+    `;
+
+    // Rank 3 (ขวา)
+    if (top3) {
+      const isTop3Me = String(top3.uid).trim() === String(currentUid).trim();
+      podiumHtml += `
+        <div class="podium-item podium-rank-3">
+          <div class="podium-avatar shadow-sm">
+            ${top3.name.charAt(0)}
+          </div>
+          <div class="small fw-bold text-truncate" style="max-width: 90px;" title="${top3.name}">
+            ${top3.name} ${isTop3Me ? '<span class="badge bg-success" style="font-size: 9px;">คุณ</span>' : ''}
+          </div>
+          <div class="text-muted" style="font-size: 11px;">${top3.room}</div>
+          <div class="podium-block shadow-sm mt-1">
+            <div class="fs-6">🥉 3</div>
+            <div class="small text-dark fw-bold">${top3.score} pts</div>
+          </div>
+        </div>
+      `;
+    } else {
+      podiumHtml += `<div class="podium-item"></div>`;
+    }
+
+    $('#podiumSection').html(podiumHtml).show();
+  } else {
+    $('#podiumSection').hide();
+  }
+
+  // แสดงผลรายการตารางอันดับทั้งหมด
+  if (filtered.length === 0) {
+    $('#leaderboardList').html(`
+      <div class="text-center py-4 text-muted bg-white rounded-4 shadow-sm">
+        <i class="fa-solid fa-user-slash fa-2x mb-2 text-secondary"></i>
+        <div>ไม่พบข้อมูลผู้ใช้งานในระดับชั้นนี้</div>
+      </div>
+    `);
+    return;
+  }
+
+  let listHtml = '';
+  filtered.forEach((item, index) => {
+    const rank = index + 1;
+    const isMe = String(item.uid).trim() === String(currentUid).trim();
+    let rankBadgeClass = 'other';
+    let rankIcon = `#${rank}`;
+    if (rank === 1) { rankBadgeClass = 'top-1'; rankIcon = '🥇'; }
+    else if (rank === 2) { rankBadgeClass = 'top-2'; rankIcon = '🥈'; }
+    else if (rank === 3) { rankBadgeClass = 'top-3'; rankIcon = '🥉'; }
+
+    const tierBadge = getTierBadge(item.score);
+
+    listHtml += `
+      <div class="lb-item d-flex align-items-center p-2 px-3 bg-white ${isMe ? 'current-user-row' : 'shadow-sm'}">
+        <div class="rank-badge ${rankBadgeClass} me-3">
+          ${rankIcon}
+        </div>
+        <div class="flex-grow-1 min-w-0 me-2">
+          <div class="d-flex align-items-center">
+            <span class="fw-bold text-truncate me-1 ${isMe ? 'text-success' : 'text-dark'}" style="max-width: 140px;">${item.name}</span>
+            ${isMe ? '<span class="badge bg-success" style="font-size: 10px;">คุณ</span>' : ''}
+          </div>
+          <div class="text-muted" style="font-size: 11px;">
+            ${item.room ? `ชั้น ${item.room}` : ''} ${item.passport ? `| รหัส ${item.passport}` : ''}
+          </div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-primary" style="font-size: 14px;">
+            <i class="fa-solid fa-coins text-warning me-1"></i>${item.score}
+          </div>
+          <div class="mt-1">${tierBadge}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  $('#leaderboardList').html(listHtml);
 }
 
   </script>
