@@ -374,7 +374,7 @@
               <strong>Gold</strong> ในปีนี้</p>
 
             <button class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
-              <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ด
+              <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ดรับพ้อยท์
             </button>
 
             <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="openEditProfileModal()">
@@ -964,7 +964,7 @@ function updateDashboardUI(score) {
 
   let remaining = nextTierScore - score;
   if (remaining > 0) {
-    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน<br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปีนี้`);
+    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/70</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปีนี้`);
   } else {
     $('#nextTierGoalText').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
   }
