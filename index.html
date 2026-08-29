@@ -597,44 +597,46 @@ text: "กำลังโหลดข้อมูล..."
       liff.login();
     }
   }).catch(err => {
-    console.error("LIFF Init Error:", err);
+    console.warn("LIFF Init Failed / Not In LINE:", err);
     $.LoadingOverlay("hide");
-    Swal.fire({
-      icon: "warning",
-      title: "เชื่อมต่อ LINE LIFF ไม่สำเร็จ",
-      html: `
-        <p>ไม่พบ LIFF ID: <code>${liffID}</code> (404 Not Found)</p>
-        <p class="small text-muted">กรุณาตรวจสอบว่า LIFF ID ใน LINE Developers Console ถูกต้อง หรือเปิดใน LINE App</p>
-      `,
-      confirmButtonText: "โหลดข้อมูลทดสอบ (Dev Mode)"
-    }).then(() => {
-      // Fallback Dev Mode: โหลดข้อมูลแรกจาก Sheet มาทดสอบการแสดงผล
-      fetch(jsonUrl)
-        .then(res => res.json())
-        .then(data => {
-          leaderboardData = data.map(item => ({
-            uid: item.Uid,
-            name: item.Name || 'ไม่ระบุชื่อ',
-            room: item.Classroom || '',
-            passport: item.Passport || '',
-            tel: item.Tel || '',
-            score: parseInt(item.Score || "0", 10)
-          }));
-          leaderboardData.sort((a, b) => b.score - a.score);
 
-          const defaultUser = data[0] || { Uid: 'test_uid', Name: 'ผู้ใช้ทดสอบ', Classroom: 'ม.6', Passport: '9999', Tel: '0900000000', Score: '100' };
-          currentUserData = defaultUser;
-          $('#uid').val(defaultUser.Uid);
+    // ดึง UID จาก URL (ถ้ามี) หรือสร้าง UID ชั่วคราวสำหรับสมัครสมาชิก
+    const urlParams = new URLSearchParams(window.location.search);
+    const existingUid = urlParams.get('uid') || 'U' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+    
+    $('#uid').val(existingUid);
+    $('#displaySection').hide();
+    $('#regSection').show();
+
+    // โหลดข้อมูลกระดานผู้นำในพื้นหลัง
+    fetch(jsonUrl)
+      .then(res => res.json())
+      .then(data => {
+        leaderboardData = data.map(item => ({
+          uid: item.Uid,
+          name: item.Name || 'ไม่ระบุชื่อ',
+          room: item.Classroom || '',
+          passport: item.Passport || '',
+          tel: item.Tel || '',
+          score: parseInt(item.Score || "0", 10)
+        }));
+        leaderboardData.sort((a, b) => b.score - a.score);
+
+        // หาก UID นี้มีในระบบอยู่แล้ว ให้สลับไปแสดงผลแดชบอร์ด
+        const matchedUser = data.find(d => d.Uid === existingUid);
+        if (matchedUser) {
+          currentUserData = matchedUser;
+          $('#regSection').hide();
           $('#displaySection').show();
-          $('#username').text(defaultUser.Name);
-          $('#phone').html(`<i class="fas fa-phone"></i> ${defaultUser.Tel}`);
-          $('.text-muted span:first').text(`ชั้น ${defaultUser.Classroom} | รหัส ${defaultUser.Passport}`);
-          
-          let score = parseInt(defaultUser.Score || "0");
+          $('#username').text(matchedUser.Name);
+          $('#phone').html(`<i class="fas fa-phone"></i> ${matchedUser.Tel}`);
+          $('.text-muted span:first').text(`ชั้น ${matchedUser.Classroom} | รหัส ${matchedUser.Passport}`);
+          let score = parseInt(matchedUser.Score || "0");
           updateDashboardUI(score);
           renderLeaderboard();
-        });
-    });
+        }
+      })
+      .catch(e => console.warn("Background fetch leaderboard error:", e));
   });
 
   $('#dataForm').ajaxForm({
