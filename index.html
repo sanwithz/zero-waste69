@@ -738,7 +738,12 @@ function submitData() {
     });
 }
 
+let isProcessingScan = false;
+let isProcessingCode = false;
+
 function submitSecretCode() {
+  if (isProcessingCode) return;
+
   const code = $('#secretCode').val().trim();
   const uid = $('#uid').val();
 
@@ -752,7 +757,9 @@ function submitSecretCode() {
     return;
   }
 
+  isProcessingCode = true;
   $.LoadingOverlay("show");
+
   fetch(serverUrl, {
     method: "POST",
     body: new URLSearchParams({
@@ -763,31 +770,68 @@ function submitSecretCode() {
     })
   }).then(res => res.json()).then(data => {
     $.LoadingOverlay("hide");
+    isProcessingCode = false;
+
     if (data.status === "success") {
-      Swal.fire("สำเร็จ", data.message || `คุณได้รับคะแนนแล้ว (+${data.point})`, "success");
+      Swal.fire({
+        icon: "success",
+        title: "สำเร็จ!",
+        text: data.message || `คุณได้รับคะแนนแล้ว (+${data.point})`,
+        confirmButtonColor: "#16a34a"
+      });
       $('#secretCode').val('');
       $('#scoreModal').modal('hide');
       refreshUserScore();
     } else if (data.status === "used") {
-      Swal.fire("รหัสถูกใช้แล้ว", data.message || "รหัสนี้ถูกใช้ไปแล้ว กรุณาลองใหม่", "warning");
+      Swal.fire({
+        icon: "warning",
+        title: "รหัสถูกใช้แล้ว",
+        text: data.message || "รหัสนี้ถูกใช้งานไปแล้ว",
+        confirmButtonColor: "#d97706"
+      });
     } else {
-      Swal.fire("รหัสไม่ถูกต้อง", data.message || "กรุณาตรวจสอบรหัสที่กรอกอีกครั้ง", "error");
+      Swal.fire({
+        icon: "error",
+        title: "รหัสไม่ถูกต้อง",
+        text: data.message || "กรุณาตรวจสอบรหัสที่กรอกอีกครั้ง",
+        confirmButtonColor: "#dc2626"
+      });
     }
   }).catch(err => {
     $.LoadingOverlay("hide");
+    isProcessingCode = false;
     Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการส่งข้อมูล", "error");
   });
 }
 
 function onScanSuccess(decodedText, decodedResult) {
-  const uid = $('#uid').val();
+  // ป้องกันการยิงซ้ำหลายรอบขณะที่กล้องยังส่อง QR อยู่
+  if (isProcessingScan) return;
+  isProcessingScan = true;
 
+  // หยุดกล้องทันทีที่ตรวจพบ QR Code
+  if (html5QrCode && isScanning) {
+    try {
+      html5QrCode.stop().then(() => {
+        isScanning = false;
+        html5QrCode.clear();
+      }).catch(e => {
+        isScanning = false;
+      });
+    } catch (e) {
+      isScanning = false;
+    }
+  }
+
+  $('#scoreModal').modal('hide');
+
+  const uid = $('#uid').val();
   if (!uid || uid === "undefined") {
+    isProcessingScan = false;
     Swal.fire("แจ้งเตือน", "กรุณาเข้าสู่ระบบ LINE เพื่อระบุตัวตนก่อน", "warning");
     return;
   }
 
-  $('#scoreModal').modal('hide');
   $.LoadingOverlay("show");
 
   fetch(serverUrl, {
@@ -802,29 +846,52 @@ function onScanSuccess(decodedText, decodedResult) {
   .then(res => res.json())
   .then(data => {
     $.LoadingOverlay("hide");
+    isProcessingScan = false;
 
     if (data.status === "success") {
-      Swal.fire("สำเร็จ", data.message || `คุณได้รับคะแนนจาก QR แล้ว (+${data.point})`, "success");
+      Swal.fire({
+        icon: "success",
+        title: "สำเร็จ!",
+        text: data.message || `คุณได้รับคะแนนจาก QR แล้ว (+${data.point})`,
+        confirmButtonColor: "#16a34a"
+      });
       refreshUserScore();
     } else if (data.status === "used") {
-      Swal.fire("QR ถูกใช้แล้ว", data.message || "QR Code นี้ถูกใช้ไปแล้ว", "warning");
+      Swal.fire({
+        icon: "warning",
+        title: "QR ถูกใช้งานแล้ว",
+        text: data.message || "QR Code นี้ถูกใช้งานไปแล้ว",
+        confirmButtonColor: "#d97706"
+      });
     } else if (data.status === "invalid") {
-      Swal.fire("ไม่สามารถใช้ QR นี้ได้", data.message || "QR นี้ไม่ถูกต้องหรือไม่มีในระบบ", "error");
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบคูปอง",
+        text: data.message || "QR นี้ไม่ถูกต้องหรือไม่มีในระบบ",
+        confirmButtonColor: "#dc2626"
+      });
     } else {
-      Swal.fire("เกิดข้อผิดพลาด", data.message || "โปรดลองใหม่ภายหลัง", "error");
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: data.message || "โปรดลองใหม่ภายหลัง",
+        confirmButtonColor: "#dc2626"
+      });
     }
   })
   .catch(err => {
     $.LoadingOverlay("hide");
+    isProcessingScan = false;
     Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการสแกน", "error");
   });
 }
-
 
 let html5QrCode = null;
 let isScanning = false;
 
 $('#scoreModal').on('shown.bs.modal', function () {
+  isProcessingScan = false;
+  isProcessingCode = false;
   html5QrCode = new Html5Qrcode("qr-reader");
   Html5Qrcode.getCameras().then(cameras => {
     if (cameras && cameras.length > 0) {
@@ -852,6 +919,8 @@ $('#scoreModal').on('shown.bs.modal', function () {
 });
 
 $('#scoreModal').on('hidden.bs.modal', function () {
+  isProcessingScan = false;
+  isProcessingCode = false;
   if (html5QrCode && isScanning) {
     html5QrCode.stop().then(() => {
       html5QrCode.clear();
