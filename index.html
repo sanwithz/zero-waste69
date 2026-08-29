@@ -371,7 +371,7 @@
               <div id="tierBadgeText" class="text-center mt-2 mb-4 fw-bold">ระดับ Silver</div>
             </div>
 
-            <p id="nextTierGoalText">สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
+            <p id="nextTierGoalText">สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/70</strong><br>เพื่อเลื่อนสถานะเป็น
               <strong>Gold</strong> ในปีนี้</p>
 
             <button class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
@@ -537,106 +537,89 @@ const jsonUrl = "https://opensheet.elk.sh/10ACvBdHWX_0QrXlAZ2Yo3bLMqbRAOfakunE16
 let currentUserData = null;
 
 $(document).ready(function () {
-
-  
   $('#regSection').hide();
+  $('#displaySection').hide();
+
+  $.LoadingOverlay("show", {
+    image: "",
+    fontawesome: "fa fa-spinner fa-spin",
+    text: "กำลังเชื่อมต่อ LINE..."
+  });
 
   liff.init({ liffId: liffID }).then(() => {
-    if (liff.isLoggedIn()) {
-
-$.LoadingOverlay("show", {
-image: "",
-fontawesome: "fa fa-spinner fa-spin",
-text: "กำลังโหลดข้อมูล..."
-})
-      
-      liff.getProfile().then(profile => {
-        const uid = profile.userId;
-        $('#uid').val(uid);
-        $('#profilePic').attr('src', profile.pictureUrl);
-
-        fetch(jsonUrl)
-          .then(res => res.json())
-          .then(data => {
-            leaderboardData = data.map(item => ({
-              uid: item.Uid,
-              name: item.Name || 'ไม่ระบุชื่อ',
-              room: item.Classroom || '',
-              passport: item.Passport || '',
-              tel: item.Tel || '',
-              score: parseInt(item.Score || "0", 10)
-            }));
-            leaderboardData.sort((a, b) => b.score - a.score);
-
-            const userData = data.find(d => d.Uid === uid);
-            if (userData) {
-              currentUserData = userData;
-              $('#displaySection').show();
-              $('#username').text(userData.Name);
-              $('#phone').html(`<i class="fas fa-phone"></i> ${userData.Tel}`);
-              $('.text-muted span:first').text(`ชั้น ${userData.Classroom} | รหัส ${userData.Passport}`);
-              $('#profilePic').attr('src', profile.pictureUrl);
-
-              let score = parseInt(userData.Score || "0");
-              updateDashboardUI(score);
-              renderLeaderboard();
-
-            } else {
-              $('#regSection').show();
-              $('#displaySection').hide();
-            }
-            $.LoadingOverlay("hide");
-          })
-          .catch(error => {
-            console.error("Fetch error:", error);
-            $.LoadingOverlay("hide");
-            Swal.fire("ผิดพลาด", "โหลดข้อมูลไม่สำเร็จ", "error");
-          });
-      });
-    } else {
+    if (!liff.isLoggedIn()) {
+      $.LoadingOverlay("hide");
       liff.login();
+      return;
     }
+
+    liff.getProfile().then(profile => {
+      const uid = profile.userId; // LINE LIFF UID แท้จริง
+      const displayName = profile.displayName || "";
+      const pictureUrl = profile.pictureUrl || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+      $('#uid').val(uid);
+      $('#profilePic').attr('src', pictureUrl);
+
+      // กรอกชื่อเริ่มต้นจาก LINE หากในฟอร์มยังว่าง
+      if (!$('#name').val()) {
+        $('#name').val(displayName);
+      }
+
+      fetch(jsonUrl)
+        .then(res => res.json())
+        .then(data => {
+          leaderboardData = data.map(item => ({
+            uid: item.Uid,
+            name: item.Name || 'ไม่ระบุชื่อ',
+            room: item.Classroom || '',
+            passport: item.Passport || '',
+            tel: item.Tel || '',
+            score: parseInt(item.Score || "0", 10)
+          }));
+          leaderboardData.sort((a, b) => b.score - a.score);
+
+          const userData = data.find(d => String(d.Uid).trim().toLowerCase() === String(uid).trim().toLowerCase());
+          if (userData) {
+            currentUserData = userData;
+            $('#displaySection').show();
+            $('#regSection').hide();
+            $('#username').text(userData.Name || displayName);
+            $('#phone').html(`<i class="fas fa-phone"></i> ${userData.Tel}`);
+            $('.text-muted span:first').text(`ชั้น ${userData.Classroom} | รหัส ${userData.Passport}`);
+            $('#profilePic').attr('src', pictureUrl);
+
+            let score = parseInt(userData.Score || "0", 10);
+            updateDashboardUI(score);
+            renderLeaderboard();
+          } else {
+            // ยังไม่เคยลงทะเบียน แสดงหน้าฟอร์มสมัครสมาชิก พร้อมใส่ LINE UID แท้จริง
+            $('#regSection').show();
+            $('#displaySection').hide();
+          }
+          $.LoadingOverlay("hide");
+        })
+        .catch(error => {
+          console.error("Fetch error:", error);
+          $.LoadingOverlay("hide");
+          $('#regSection').show();
+          $('#displaySection').hide();
+        });
+    }).catch(profileErr => {
+      console.error("Get Profile Error:", profileErr);
+      $.LoadingOverlay("hide");
+      liff.login();
+    });
   }).catch(err => {
-    console.warn("LIFF Init Failed / Not In LINE:", err);
+    console.error("LIFF Init Error:", err);
     $.LoadingOverlay("hide");
-
-    // ดึง UID จาก URL (ถ้ามี) หรือสร้าง UID ชั่วคราวสำหรับสมัครสมาชิก
     const urlParams = new URLSearchParams(window.location.search);
-    const existingUid = urlParams.get('uid') || 'U' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-    
-    $('#uid').val(existingUid);
-    $('#displaySection').hide();
+    const paramUid = urlParams.get('uid') || '';
+    if (paramUid) {
+      $('#uid').val(paramUid);
+    }
     $('#regSection').show();
-
-    // โหลดข้อมูลกระดานผู้นำในพื้นหลัง
-    fetch(jsonUrl)
-      .then(res => res.json())
-      .then(data => {
-        leaderboardData = data.map(item => ({
-          uid: item.Uid,
-          name: item.Name || 'ไม่ระบุชื่อ',
-          room: item.Classroom || '',
-          passport: item.Passport || '',
-          tel: item.Tel || '',
-          score: parseInt(item.Score || "0", 10)
-        }));
-        leaderboardData.sort((a, b) => b.score - a.score);
-
-        // หาก UID นี้มีในระบบอยู่แล้ว ให้สลับไปแสดงผลแดชบอร์ด
-        const matchedUser = data.find(d => d.Uid === existingUid);
-        if (matchedUser) {
-          currentUserData = matchedUser;
-          $('#regSection').hide();
-          $('#displaySection').show();
-          $('#username').text(matchedUser.Name);
-          $('#phone').html(`<i class="fas fa-phone"></i> ${matchedUser.Tel}`);
-          $('.text-muted span:first').text(`ชั้น ${matchedUser.Classroom} | รหัส ${matchedUser.Passport}`);
-          let score = parseInt(matchedUser.Score || "0");
-          updateDashboardUI(score);
-          renderLeaderboard();
-        }
-      })
-      .catch(e => console.warn("Background fetch leaderboard error:", e));
+    $('#displaySection').hide();
   });
 
   $('#dataForm').ajaxForm({
@@ -1399,9 +1382,9 @@ function renderLeaderboard() {
   <footer style="font-size: 14px;">
     © <script>
       document.write(new Date().getFullYear());
-    </script> Copyright | พัฒนาโดยครูสิทธิชาติ สิทธิ
-    <a href="https://www.facebook.com/SanwithzWebapp" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-    <a href="https://www.youtube.com/@Sanwithz" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+    </script> Copyright | พัฒนาโดยกิจกรรมพัฒนาผู้เรียน โรงเรียนหนองบัวพิทยาคาร
+    <!-- <a href="https://www.facebook.com/SanwithzWebapp" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+    <a href="https://www.youtube.com/@Sanwithz" target="_blank"><i class="fa-brands fa-youtube"></i></a> -->
   </footer>
 
 </body>
