@@ -271,6 +271,7 @@
       <div class=" mt-5">
         <h2 class="text-center">ระบบลงทะเบียนใช้งาน</h2>
         <form id="dataForm" class="list mt-3">
+          <input type="hidden" name="action" value="register">
           <div class="mb-3">
             <label for="uid" class="form-label disable ">UID</label>
             <input type="text" class="form-control" id="uid" name="uid" readonly>
@@ -370,11 +371,11 @@
               <div id="tierBadgeText" class="text-center mt-2 mb-4 fw-bold">ระดับ Silver</div>
             </div>
 
-            <p id="nextTierGoalText">สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/70</strong><br>เพื่อเลื่อนสถานะเป็น
+            <p id="nextTierGoalText">สะสมอีก <strong>50</strong> พ้อยท์ ภายใน <strong>31/12/65</strong><br>เพื่อเลื่อนสถานะเป็น
               <strong>Gold</strong> ในปีนี้</p>
 
             <button class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#scoreModal">
-              <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ดรับพ้อยท์
+              <i class="fa-solid fa-qrcode"></i> สแกนคิวอาร์โค้ด
             </button>
 
             <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="openEditProfileModal()">
@@ -697,16 +698,24 @@ text: "กำลังโหลดข้อมูล..."
 });
 
 function submitData() {
-$.LoadingOverlay("show", {
-image: "",
-fontawesome: "fa fa-spinner fa-spin",
-text: "กำลังบันทึกข้อมูล..."
-})
+  const uid = $('#uid').val();
+  if (!uid || uid === "undefined") {
+    Swal.fire("แจ้งเตือน", "กรุณาเข้าสู่ระบบ LINE ก่อนทำรายการ", "warning");
+    return;
+  }
+
+  $.LoadingOverlay("show", {
+    image: "",
+    fontawesome: "fa fa-spinner fa-spin",
+    text: "กำลังบันทึกข้อมูล..."
+  });
 
   const data = {
-    name: $('#username').text(),
-    phone: $('#phone').text().replace("📞", "").trim(),
-    points: $('#points').text(),
+    action: 'saveScore',
+    uid: uid,
+    name: $('#username').text().trim(),
+    phone: $('#phone').text().replace(/[^0-9]/g, "").trim(),
+    points: $('#points').text().trim(),
     tier: "Silver"
   };
 
@@ -717,7 +726,11 @@ text: "กำลังบันทึกข้อมูล..."
     .then(res => res.json())
     .then(result => {
       $.LoadingOverlay("hide");
-      Swal.fire("ส่งข้อมูลแล้ว", "ระบบบันทึกพ้อยท์เรียบร้อย", "success");
+      if (result.status === "success") {
+        Swal.fire("ส่งข้อมูลแล้ว", "ระบบบันทึกพ้อยท์เรียบร้อย", "success");
+      } else {
+        Swal.fire("ผิดพลาด", result.message || "ไม่สามารถบันทึกข้อมูลได้", "error");
+      }
     })
     .catch(error => {
       $.LoadingOverlay("hide");
@@ -725,12 +738,17 @@ text: "กำลังบันทึกข้อมูล..."
     });
 }
 
-
-  
 function submitSecretCode() {
   const code = $('#secretCode').val().trim();
+  const uid = $('#uid').val();
+
+  if (!uid || uid === "undefined") {
+    Swal.fire("แจ้งเตือน", "กรุณาเข้าสู่ระบบ LINE เพื่อระบุตัวตนก่อน", "warning");
+    return;
+  }
+
   if (!code) {
-    Swal.fire("กรุณากรอกรหัสลับ");
+    Swal.fire("แจ้งเตือน", "กรุณากรอกรหัสลับ", "warning");
     return;
   }
 
@@ -738,20 +756,22 @@ function submitSecretCode() {
   fetch(serverUrl, {
     method: "POST",
     body: new URLSearchParams({
-      uid: $('#uid').val(),
+      action: 'claimCoupon',
+      uid: uid,
       code: code,
       type: 'manual'
     })
   }).then(res => res.json()).then(data => {
     $.LoadingOverlay("hide");
     if (data.status === "success") {
-      Swal.fire("สำเร็จ", "คุณได้รับคะแนนแล้ว", "success");
+      Swal.fire("สำเร็จ", data.message || `คุณได้รับคะแนนแล้ว (+${data.point})`, "success");
+      $('#secretCode').val('');
       $('#scoreModal').modal('hide');
       refreshUserScore();
     } else if (data.status === "used") {
-      Swal.fire("รหัสถูกใช้แล้ว", "รหัสนี้ถูกใช้ไปแล้ว กรุณาลองใหม่", "warning");
+      Swal.fire("รหัสถูกใช้แล้ว", data.message || "รหัสนี้ถูกใช้ไปแล้ว กรุณาลองใหม่", "warning");
     } else {
-      Swal.fire("รหัสไม่ถูกต้อง", "กรุณาตรวจสอบรหัสที่กรอกอักครั้ง", "error");
+      Swal.fire("รหัสไม่ถูกต้อง", data.message || "กรุณาตรวจสอบรหัสที่กรอกอีกครั้ง", "error");
     }
   }).catch(err => {
     $.LoadingOverlay("hide");
@@ -759,16 +779,23 @@ function submitSecretCode() {
   });
 }
 
-
 function onScanSuccess(decodedText, decodedResult) {
+  const uid = $('#uid').val();
+
+  if (!uid || uid === "undefined") {
+    Swal.fire("แจ้งเตือน", "กรุณาเข้าสู่ระบบ LINE เพื่อระบุตัวตนก่อน", "warning");
+    return;
+  }
+
   $('#scoreModal').modal('hide');
   $.LoadingOverlay("show");
 
   fetch(serverUrl, {
     method: "POST",
     body: new URLSearchParams({
-      uid: $('#uid').val(),
-      code: decodedText,
+      action: 'claimCoupon',
+      uid: uid,
+      code: decodedText.trim(),
       type: 'scan'
     })
   })
@@ -777,12 +804,14 @@ function onScanSuccess(decodedText, decodedResult) {
     $.LoadingOverlay("hide");
 
     if (data.status === "success") {
-      Swal.fire("สำเร็จ", `คุณได้รับคะแนนจาก QR แล้ว (+${data.point})`, "success");
+      Swal.fire("สำเร็จ", data.message || `คุณได้รับคะแนนจาก QR แล้ว (+${data.point})`, "success");
       refreshUserScore();
+    } else if (data.status === "used") {
+      Swal.fire("QR ถูกใช้แล้ว", data.message || "QR Code นี้ถูกใช้ไปแล้ว", "warning");
     } else if (data.status === "invalid") {
-      Swal.fire("ไม่สามารถใช้ QR นี้ได้", data.message || "QR นี้ไม่ถูกต้องหรือถูกใช้ไปแล้ว", "error");
+      Swal.fire("ไม่สามารถใช้ QR นี้ได้", data.message || "QR นี้ไม่ถูกต้องหรือไม่มีในระบบ", "error");
     } else {
-      Swal.fire("เกิดข้อผิดพลาด", "โปรดลองใหม่ภายหลัง", "error");
+      Swal.fire("เกิดข้อผิดพลาด", data.message || "โปรดลองใหม่ภายหลัง", "error");
     }
   })
   .catch(err => {
@@ -964,7 +993,7 @@ function updateDashboardUI(score) {
 
   let remaining = nextTierScore - score;
   if (remaining > 0) {
-    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน <strong>31/12/70</strong><br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปีนี้`);
+    $('#nextTierGoalText').html(`สะสมอีก <strong>${remaining}</strong> พ้อยท์ ภายใน<br>เพื่อเลื่อนสถานะเป็น <strong>${nextTierName}</strong> ในปีนี้`);
   } else {
     $('#nextTierGoalText').html(`คุณอยู่ในระดับสูงสุดแล้ว 🎉`);
   }
